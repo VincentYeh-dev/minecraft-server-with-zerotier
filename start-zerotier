@@ -1,0 +1,82 @@
+#!/bin/bash
+join_network() {
+	printf "Joining Network : $NETWORK_ID ...\n"
+	/usr/sbin/zerotier-cli join $NETWORK_ID
+	e2=$?
+	if [ "$e2" = "0" ]
+	then
+		printf "Done!\n"
+		return 0
+	fi
+
+	printf "Failed!\n"
+	return -1
+}
+
+join_network_until_success() {
+	while :
+	do
+		join_network
+		if [ "$?" = "0" ]
+		then
+			break
+		fi
+		sleep 3s
+	done
+}
+
+while :
+do
+	printf "Connecting to Zerotier....\n"
+	/usr/sbin/zerotier-one -d
+	e1=$?
+	if [ "$e1" = "0" ]
+	then
+		printf "Done!\n"
+		break
+	fi
+
+	printf "Failed!\n"
+	sleep 1s
+done
+
+sleep 3s
+
+join_network_until_success
+
+sleep 3s
+
+while :
+do	
+	cmd=$(/usr/sbin/zerotier-cli listnetworks)
+	e3=$?
+	echo $cmd
+	if [ "$e3" = "0" ]
+	then
+		if [[ $cmd == *"REQUESTING_CONFIGURATION"* ]]
+		then
+			printf "Wait for approval\n"
+			sleep 20s
+		elif [[ $cmd == *"ACCESS_DENIED"* ]]
+		then
+			printf "Access Denied\n"
+			join_network_until_success
+			sleep 30s
+		elif [[ $cmd == *"OK"* ]]
+		then
+			printf "Join network : $NETWORK_ID\n"
+			break
+		fi
+		
+	fi
+    sleep 5s
+done
+echo "============================="
+ifconfig
+echo "-----------------------------"
+/usr/sbin/zerotier-cli info
+echo "-----------------------------"
+/usr/sbin/zerotier-cli listnetworks
+echo "============================="
+
+exit 0

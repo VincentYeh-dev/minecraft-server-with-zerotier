@@ -1,0 +1,21 @@
+version: '3.3'
+services:
+    minecraft-server:
+        restart: unless-stopped
+        environment:
+            - EULA=TRUE
+            - MODE=creative
+            - MAX_MEMORY=4G
+            - VERSION=1.18.1
+            - NETWORK_ID=d3ecf5726d8479b4
+            - OPS=VincentYehGM
+        network_mode: bridge
+        devices:
+            - /dev/net/tun
+        ports:
+            - '25565:25565'
+        container_name: mc_vpn
+        image: minecraft-server-zerotier:latest
+        cap_add:
+            - NET_ADMIN
+            - SYS_ADMIN
