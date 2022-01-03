@@ -1,0 +1,40 @@
+#!/bin/bash
+while :
+do
+	/usr/sbin/zerotier-one -d
+	e1=$?
+	echo "e1:$e1"
+	if [ "$e1" = "0" ]
+	then
+		echo OK
+		break
+	fi
+	sleep 1s
+done
+while :
+do
+	/usr/sbin/zerotier-cli join $NETWORK_ID
+	e2=$?
+	echo "e2:$e2"
+	if [ "$e2" = "0" ]
+	then
+		echo OK
+		break
+	fi
+	sleep 1s
+done
+
+while :
+do
+	/usr/sbin/zerotier-cli listnetworks >> /start_zero_tier_logs.txt
+	e3=$?
+	echo "e3:$e3"
+	if [ "$e3" = "0" ]
+	then
+		echo OK
+		break
+	fi
+	sleep 1s
+done
+/start
+exit 0

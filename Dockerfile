@@ -6,7 +6,7 @@ RUN apt-get install curl gnupg net-tools iputils-ping -y
 
 RUN curl https://install.zerotier.com/ | bash
 
-ADD start-zero-tier.sh /start-zero-tier.sh
-RUN chmod +x /start-zero-tier.sh
+ADD start-zerotier-server /start-zerotier-server
+RUN chmod +x /start-zerotier-server
 
-CMD ["echo", "AAA"]
+ENTRYPOINT /start-zerotier-server
