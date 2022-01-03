@@ -1,32 +1,40 @@
 #!/bin/bash
+echo "Connecting to Zerotier...."
 while :
 do
 	/usr/sbin/zerotier-one -d
 	e1=$?
-	echo "e1:$e1"
+	echo "runing /usr/sbin/zerotier-one ..."
 	if [ "$e1" = "0" ]
 	then
-		echo OK
+		echo "Done!"
 		break
 	fi
+	echo "Fail"
 	sleep 1s
+	echo "Reconnecting..."
 done
+
+echo "Joining Network : $NETWORK_ID ..."
 while :
 do
 	/usr/sbin/zerotier-cli join $NETWORK_ID
 	e2=$?
-	echo "e2:$e2"
+	echo "runing /usr/sbin/zerotier-cli join $NETWORK_ID ..."
 	if [ "$e2" = "0" ]
 	then
-		echo OK
+		echo "Done!"
 		break
 	fi
-	sleep 1s
+
+	echo "Fail"
+        sleep 1s
+        echo "Reconnecting..."
 done
 
 while :
 do
-	/usr/sbin/zerotier-cli listnetworks >> /start_zero_tier_logs.txt
+	/usr/sbin/zerotier-cli listnetworks
 	e3=$?
 	echo "e3:$e3"
 	if [ "$e3" = "0" ]
@@ -36,5 +44,9 @@ do
 	fi
 	sleep 1s
 done
+
+ifconfig
+
+echo "Start minecraft server"
 /start
 exit 0
